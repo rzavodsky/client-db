@@ -1,4 +1,5 @@
 from jsonschema import Draft7Validator
+from db import client_types
 
 client_schema = {
     "type": "object",
@@ -6,7 +7,7 @@ client_schema = {
         "name": { "type": "string", "maxLength": 50 },
         "address": { "type": "string", "maxLength": 100 },
         "ico": { "type": "string", "pattern": "^(?:(?:\d ?){8}|(?:\d ?){6})$"}, # Match a string with 6 or 8 digits, each digit can have an optional space after it
-        "type": { "enum": ["pravnicka_osoba", "fyzicka_osoba"] }
+        "type": { "enum": client_types }
     },
     "additionalProperties": False,
 }
