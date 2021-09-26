@@ -23,7 +23,7 @@ class Client(BaseModel):
 
 
 class Contact(BaseModel):
-    client       = ForeignKeyField(Client, backref="contacts")
+    client_id    = ForeignKeyField(Client, backref="contacts")
     name         = TextField()
     phone_number = TextField()
     email        = TextField()
