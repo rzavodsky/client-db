@@ -46,26 +46,3 @@ def delete_client(client_id: int):
     client = Client.get_by_id(client_id)
     client.delete_instance()
     return "", 204 # No Content
-
-
-@clients.before_request
-def check_json():
-    request.on_json_loading_failed = on_json_loading_failed
-    if not request.is_json and request.method != "GET":
-        return {"error": "Requests must be JSON"}, 400
-
-def on_json_loading_failed(e):
-    abort(make_response({"error": "Can't parse JSON"}, 400))
-
-@clients.errorhandler(DoesNotExist)
-def handle_client_not_exist(e: DoesNotExist):
-    return {"error": "Client not found"}, 404 # Not Found
-
-@clients.errorhandler(IntegrityError)
-def handle_duplicate_field(e: IntegrityError):
-    if isinstance(e.orig, UniqueViolation) and "ico" in str(e.orig):
-        return {"error": "ico already exists in the database"}, 409 # Conflict
-
-@clients.errorhandler(ValidationError)
-def handle_validation_error(e: ValidationError):
-    return {"error": e.message}, 400 # Bad Request
