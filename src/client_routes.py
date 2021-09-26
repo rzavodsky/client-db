@@ -44,5 +44,5 @@ def partial_update_client(client_id: int):
 @clients.route("/<int:client_id>", methods = ["DELETE"])
 def delete_client(client_id: int):
     client = Client.get_by_id(client_id)
-    client.delete_instance()
+    client.delete_instance(recursive=True) # Deletes all related contacts as well
     return "", 204 # No Content
