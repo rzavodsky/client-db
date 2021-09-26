@@ -7,15 +7,15 @@ from jsonschema import ValidationError
 
 clients = Blueprint("clients", __name__)
 
-@clients.route("/clients")
+@clients.route("")
 def get_all_clients():
     return {"data": [client.__data__ for client in Client.select()]}
 
-@clients.route("/clients/<int:client_id>")
+@clients.route("/<int:client_id>")
 def get_single_client(client_id: int):
     return Client.get_by_id(client_id).__data__
 
-@clients.route("/clients", methods = ["POST"])
+@clients.route("", methods = ["POST"])
 def add_client():
     body = request.json
     ClientValidator.validate(body)
@@ -23,7 +23,7 @@ def add_client():
     return client.__data__
 
 
-@clients.route("/clients/<int:client_id>", methods = ["PUT"])
+@clients.route("/<int:client_id>", methods = ["PUT"])
 def update_client(client_id: int):
     body = request.json
     ClientValidator.validate(body)
@@ -32,7 +32,7 @@ def update_client(client_id: int):
     client.save()
     return client.__data__
 
-@clients.route("/clients/<int:client_id>", methods = ["PATCH"])
+@clients.route("/<int:client_id>", methods = ["PATCH"])
 def partial_update_client(client_id: int):
     body = request.json
     ClientPATCHValidator.validate(body)
@@ -41,7 +41,7 @@ def partial_update_client(client_id: int):
     client.save()
     return client.__data__
 
-@clients.route("/clients/<int:client_id>", methods = ["DELETE"])
+@clients.route("/<int:client_id>", methods = ["DELETE"])
 def delete_client(client_id: int):
     client = Client.get_by_id(client_id)
     client.delete_instance()
