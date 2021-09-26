@@ -20,6 +20,7 @@ contact_schema = {
         "name": { "type": "string", "maxLength": 50 },
         "address": { "type": "string", "maxLength": 100 },
         "phone_number": { "type": "string", "pattern": "^\+?(?: ?\d){5,20}$"}, # Match a string with 5-20 digits, each digit can have a optional space before it. Can start with a +
+        "email": { "type": "string", "maxLength": 50, "pattern": "^.+@.+\..+$"} # String has to include '@' and '.' in that order
     },
     "additionalProperties": False,
 }
