@@ -49,15 +49,18 @@ def create_enum():
             # Type already exists
             pass
 
+@app.before_first_request
+def app_setup():
+    db.connect()
+    # Create the type enum
+    create_enum()
+    db.create_tables([Client, Contact])
+
+app.register_blueprint(clients, url_prefix="/clients")
+app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
+
 if __name__ == "__main__":
     try:
-        db.connect()
-        # Create the type enum
-        create_enum()
-        db.create_tables([Client, Contact])
-
-        app.register_blueprint(clients, url_prefix="/clients")
-        app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
         app.run(host="0.0.0.0", port=5000, debug = True)
     finally:
         db.close()
