@@ -12,7 +12,7 @@ def get_all_contacts(client_id):
 
 @contacts.route("/<int:contact_id>")
 def get_single_contact(client_id, contact_id):
-    contact = Contact.get_by_id(contact_id)
+    contact = Contact.get(id=contact_id, client_id=client_id)
     return contact.__data__
 
 @contacts.route("", methods = ["POST"])
@@ -27,7 +27,7 @@ def add_contact(client_id):
 def update_contact(client_id, contact_id):
     body = request.json
     ContactValidator.validate(body)
-    contact = Contact.get_by_id(contact_id)
+    contact = Contact.get(id=contact_id, client_id=client_id)
     contact.__data__ = {**contact.__data__, **body};
     contact.save()
     return contact.__data__
@@ -36,13 +36,13 @@ def update_contact(client_id, contact_id):
 def partial_update_contact(client_id, contact_id):
     body = request.json
     ContactPATCHValidator.validate(body)
-    contact = Contact.get_by_id(contact_id)
+    contact = Contact.get(id=contact_id, client_id=client_id)
     contact.__data__ = {**contact.__data__, **body};
     contact.save()
     return contact.__data__
 
 @contacts.route("/<int:contact_id>", methods = ["DELETE"])
 def delete_contact(client_id, contact_id):
-    contact = Contact.get_by_id(contact_id)
+    contact = Contact.get(id=contact_id, client_id=client_id)
     contact.delete_instance()
     return "", 204 # No Content
