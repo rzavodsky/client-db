@@ -40,27 +40,35 @@ def handle_validation_error(e: ValidationError):
     return {"error": e.message}, 400 # Bad Request
 
 
-def create_enum():
-    with db.atomic() as transaction:
+def setup_database():
+    with db.database:
+        db.database.create_tables([Client, Contact])
         try:
             enum_fields = ", ".join(f"'{field}'" for field in client_types)
-            db.execute_sql(f"CREATE TYPE e_type AS ENUM ({enum_fields})")
+            db.database.execute_sql(f"CREATE TYPE e_type AS ENUM ({enum_fields})")
         except ProgrammingError:
             # Type already exists
             pass
 
-@app.before_first_request
-def app_setup():
-    db.connect()
-    # Create the type enum
-    create_enum()
-    db.create_tables([Client, Contact])
 
-app.register_blueprint(clients, url_prefix="/clients")
-app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
+def create_app():
+    app.config["DATABASE"] = {
+        "name": "postgres",
+        "engine": "playhouse.pool.PooledPostgresqlDatabase",
+        "user": "postgres",
+        "password": "postgres",
+        "host": "db",
+        "max_connections": 32,
+        "stale_timeout": 600,
+    }
+
+    app.register_blueprint(clients, url_prefix="/clients")
+    app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
+
+    db.init_app(app)
+    setup_database()
+    return app
 
 if __name__ == "__main__":
-    try:
-        app.run(host="0.0.0.0", port=5000, debug = True)
-    finally:
-        db.close()
+    app = create_app()
+    app.run(host="0.0.0.0", port=5000, debug = True)
