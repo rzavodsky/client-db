@@ -1,12 +1,23 @@
 version: "3.9"
 
 services:
-  api:
-    build: .
+  api_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile_dev
     ports:
       - "5000:5000"
     volumes:
       - ./src:/code
+    depends_on:
+      - db
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile_prod
+    ports:
+      - "80:80"
     depends_on:
       - db
 
