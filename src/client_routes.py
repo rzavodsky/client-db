@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 from flask import Blueprint, request, abort, make_response
 from psycopg2.errors import UniqueViolation
+from jsonschema import ValidationError
+
 from db import Client, DoesNotExist, IntegrityError
 from schema_validation import ClientValidator, ClientPATCHValidator
-from jsonschema import ValidationError
 
 clients = Blueprint("clients", __name__)
 
 @clients.route("")
 def get_all_clients():
-    return {"data": [client.__data__ for client in Client.select()]}
+    if request.args.get("q"):
+        clients = Client.select().where(Client.name.contains(request.args.get("q")))
+    else:
+        clients = Client.select()
+    return {"data": [client.__data__ for client in clients]}
 
 @clients.route("/<int:client_id>")
 def get_single_client(client_id: int):

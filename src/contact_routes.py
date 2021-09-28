@@ -8,7 +8,11 @@ contacts = Blueprint('contacts', __name__)
 @contacts.route("")
 def get_all_contacts(client_id):
     client = Client.get_by_id(client_id)
-    return { "data": [contact.__data__ for contact in client.contacts] }
+    if request.args.get("q"):
+        contacts = Contact.select().where((Contact.client_id == client_id) & Contact.name.contains(request.args.get("q")))
+    else:
+        contacts = client.contacts
+    return { "data": [contact.__data__ for contact in contacts] }
 
 @contacts.route("/<int:contact_id>")
 def get_single_contact(client_id, contact_id):
