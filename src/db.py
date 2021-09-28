@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 from peewee import *
+from playhouse.flask_utils import FlaskDB
 
-db = PostgresqlDatabase("postgres", user = "postgres", password = "postgres", host = "db")
-
-class BaseModel(Model):
-    '''Base model that uses the Postgres db. All other models should extend this'''
-    class Meta:
-        database = db
+db = FlaskDB()
 
 client_types = ['pravnicka_osoba', 'fyzicka_osoba']
 class TypeField(Field):
@@ -15,14 +11,14 @@ class TypeField(Field):
     field_type = "e_type"
 
 
-class Client(BaseModel):
+class Client(db.Model):
     name    = TextField()
     address = TextField()
     ico     = TextField(unique=True)
     type    = TypeField()
 
 
-class Contact(BaseModel):
+class Contact(db.Model):
     client_id    = ForeignKeyField(Client, backref="contacts")
     name         = TextField()
     phone_number = TextField()
