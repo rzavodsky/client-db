@@ -42,13 +42,13 @@ def handle_validation_error(e: ValidationError):
 
 def setup_database():
     with db.database:
-        db.database.create_tables([Client, Contact])
         try:
             enum_fields = ", ".join(f"'{field}'" for field in client_types)
             db.database.execute_sql(f"CREATE TYPE e_type AS ENUM ({enum_fields})")
         except ProgrammingError:
             # Type already exists
             pass
+        db.database.create_tables([Client, Contact])
 
 
 def create_app():
@@ -57,6 +57,7 @@ def create_app():
         "engine": "playhouse.pool.PooledPostgresqlDatabase",
         "user": "postgres",
         "password": "postgres",
+        "autorollback": True,
         "host": "db",
         "max_connections": 32,
         "stale_timeout": 600,
