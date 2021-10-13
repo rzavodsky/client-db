@@ -4,4 +4,4 @@
 tmp/
 
 *.py[cod]
-venv
+venv*
