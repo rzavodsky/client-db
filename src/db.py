@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
-from peewee import *
-from playhouse.flask_utils import FlaskDB
-
-db = FlaskDB()
+from sqlalchemy import create_engine, String, Column, Integer
+from sqlalchemy.ext.declarative import declarative_base
 
 client_types = ['pravnicka_osoba', 'fyzicka_osoba']
-class TypeField(Field):
-    '''Peewee doesn't support Postgres Enums, so this custom field is a way to let Peewee use the e_type enum.
-    The enum itself needs to be created manually in app.py when connecting to the database'''
-    field_type = "e_type"
+Base = declarative_base()
 
+class Client(Base):
+    __tablename__ = "klienti"
 
-class Client(db.Model):
-    name    = TextField()
-    address = TextField()
-    ico     = TextField(unique=True)
-    type    = TypeField()
+    id      = Column("klient_id", Integer, primary_key=True)
+    name    = Column("knazov", String)
+    ico     = Column("kico", String)
+    zruseny = Column(String)
 
+class Contact(Base):
+    __tablename__ = "klient_kontakt"
 
-class Contact(db.Model):
-    client_id    = ForeignKeyField(Client, backref="contacts")
-    name         = TextField()
-    phone_number = TextField()
-    email        = TextField()
-    address      = TextField()
+    id           = Column("kkontakt_id", Integer)
+    client_id    = Column("kklient_id", Integer)
+    name         = Column("kkmeno", String)
+    phone_number = Column("kktel", String)
+    email        = Column("kkemail", String)
