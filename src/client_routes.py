@@ -51,3 +51,8 @@ def delete_client(client_id: int):
     client = Client.get_by_id(client_id)
     client.delete_instance(recursive=True) # Deletes all related contacts as well
     return "", 204 # No Content
+
+class ClientNotFoundException(Exception):
+    """Raised when a Client wasn't found in the database"""
+    def __init__(self, client_id):
+        self.client_id = client_id
