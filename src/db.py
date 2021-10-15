@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
-from sqlalchemy import create_engine, String, Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from flask_sqlalchemy import SQLAlchemy
 
-client_types = ['pravnicka_osoba', 'fyzicka_osoba']
-Base = declarative_base()
+db = SQLAlchemy()
 
-class Client(Base):
+class Client(db.Model):
     __tablename__ = "klienti"
 
-    id      = Column("klient_id", Integer, primary_key=True)
-    name    = Column("knazov", String)
-    ico     = Column("kico", String)
-    zruseny = Column(String)
+    id      = db.Column("klient_id", db.Integer, primary_key=True)
+    name    = db.Column("knazov", db.String, nullable=False)
+    ico     = db.Column("kico", db.String, nullable=False)
+    zruseny = db.Column(db.String, nullable=False)
 
-class Contact(Base):
+    def as_dict(self):
+        columns = ["id", "name", "ico"] # Columns that should be included in the conversion
+        return {name: getattr(self, name) for name in columns}
+
+class Contact(db.Model):
     __tablename__ = "klient_kontakt"
 
-    id           = Column("kkontakt_id", Integer)
-    client_id    = Column("kklient_id", Integer)
-    name         = Column("kkmeno", String)
-    phone_number = Column("kktel", String)
-    email        = Column("kkemail", String)
+    id           = db.Column("kkontakt_id", db.Integer, primary_key=True)
+    client_id    = db.Column("kklient_id", db.Integer, db.ForeignKey("klienti.klient_id"))
+    name         = db.Column("kkmeno", db.String, nullable=False)
+    phone_number = db.Column("kktel", db.String)
+    email        = db.Column("kkemail", db.String)
+
+    def as_dict(self):
+        columns = ["id", "client_id", "name", "phone_number", "email"] # Columns that should be included in the conversion
+        return {name: getattr(self, name) for name in columns}
