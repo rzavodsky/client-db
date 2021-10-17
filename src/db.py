@@ -11,6 +11,8 @@ class Client(db.Model):
     ico     = db.Column("kico", db.String, nullable=False)
     zruseny = db.Column(db.String, nullable=False, default=0)
 
+    contacts = db.relationship("Contact", back_populates="client")
+
     def as_dict(self):
         columns = ["id", "name", "ico"] # Columns that should be included in the conversion
         return {name: getattr(self, name) for name in columns}
@@ -23,6 +25,8 @@ class Contact(db.Model):
     name         = db.Column("kkmeno", db.String, nullable=False)
     phone_number = db.Column("kktel", db.String)
     email        = db.Column("kkemail", db.String)
+
+    client = db.relationship("Client", back_populates="contacts")
 
     def as_dict(self):
         columns = ["id", "client_id", "name", "phone_number", "email"] # Columns that should be included in the conversion
