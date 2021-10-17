@@ -5,7 +5,7 @@ from jsonschema import ValidationError
 from db import db, Client, Contact
 
 # Routes
-from contact_routes import contacts
+from contact_routes import contacts, ContactNotFoundException
 from client_routes import clients, ClientNotFoundException
 
 ### Error Handling ###
@@ -21,6 +21,9 @@ def on_json_loading_failed(e):
 
 def handle_client_not_found(e: ClientNotFoundException):
     return {"error": f"Client {e.client_id} not found"}
+
+def handle_contact_not_found(e: ContactNotFoundException):
+    return {"error": f"Contact {e.contact_id} was not found under client {e.client_id}"}
 
 def handle_validation_error(e: ValidationError):
     return {"error": e.message}, 400 # Bad Request
@@ -39,6 +42,7 @@ def create_app():
     app.before_request(check_json)
     app.register_error_handler(ValidationError, handle_validation_error)
     app.register_error_handler(ClientNotFoundException, handle_client_not_found)
+    app.register_error_handler(ContactNotFoundException, handle_contact_not_found)
 
     # Register blueprints
     app.register_blueprint(clients, url_prefix="/clients")
