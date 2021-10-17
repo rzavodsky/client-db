@@ -4,27 +4,23 @@ client_schema = {
     "type": "object",
     "properties": {
         "name": { "type": "string", "maxLength": 50 },
-        # "address": { "type": "string", "maxLength": 100 },
-        "ico": { "type": "string", "pattern": "^(?:(?:\d ?){8}|(?:\d ?){6})$"}, # Match a string with 6 or 8 digits, each digit can have an optional space after it
+        "ico": { "type": "string", "maxLength": 20, "pattern": "^(?:(?:\d ?){8}|(?:\d ?){6})$"}, # Match a string with 6 or 8 digits, each digit can have an optional space after it
     },
     "additionalProperties": False,
 }
 # All fields that should be required in a POST or PUT request
-# client_schema_required = ["name", "address", "ico"]
 client_schema_required = ["name", "ico"]
 
 contact_schema = {
     "type": "object",
     "properties": {
         "name": { "type": "string", "maxLength": 50 },
-        # "address": { "type": "string", "maxLength": 100 },
-        "phone_number": { "type": "string", "pattern": "^\+?(?: ?\d){5,20}$"}, # Match a string with 5-20 digits, each digit can have a optional space before it. Can start with a +
-        "email": { "type": "string", "maxLength": 50, "pattern": "^.+@.+\..+$"} # String has to include '@' and '.' in that order
+        "phone_number": { "type": "string", "pattern": "^\+?(?: ?\d){5,20}$", "maxLength": 40}, # Match a string with 5-20 digits, each digit can have a optional space before it. Can start with a +
+        "email": { "type": "string", "maxLength": 100, "pattern": "^.+@.+\..+$"} # String has to include '@' and '.' in that order
     },
     "additionalProperties": False,
 }
 # All fields that should be required in a POST or PUT request
-# contact_schema_required = ["name", "address", "phone_number", "email"]
 contact_schema_required = ["name", "phone_number", "email"]
 
 
