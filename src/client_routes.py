@@ -28,7 +28,6 @@ def add_client():
     body = request.json
     ClientValidator.validate(body)
     client = Client(**body)
-    client.zruseny = 0
     db.session.add(client)
     db.session.commit()
     return client.as_dict()

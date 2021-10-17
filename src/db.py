@@ -9,7 +9,7 @@ class Client(db.Model):
     id      = db.Column("klient_id", db.Integer, primary_key=True)
     name    = db.Column("knazov", db.String, nullable=False)
     ico     = db.Column("kico", db.String, nullable=False)
-    zruseny = db.Column(db.String, nullable=False)
+    zruseny = db.Column(db.String, nullable=False, default=0)
 
     def as_dict(self):
         columns = ["id", "name", "ico"] # Columns that should be included in the conversion
