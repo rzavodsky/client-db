@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 from flask import Blueprint, request
+
 from client_routes import ClientNotFoundException
 from db import db, Client, Contact
 from schema_validation import ContactValidator, ContactPATCHValidator
+from auth import require_auth
 
 contacts = Blueprint('contacts', __name__)
 
 @contacts.route("")
+@require_auth
 def get_all_contacts(client_id):
     client = Client.query.get(client_id)
     if client is None:
@@ -19,6 +22,7 @@ def get_all_contacts(client_id):
     return { "data": [contact.as_dict() for contact in contacts] }
 
 @contacts.route("/<int:contact_id>")
+@require_auth
 def get_single_contact(client_id, contact_id):
     contact = Contact.query.filter(Contact.client_id == client_id, Contact.id == contact_id).first()
     if contact is None:
@@ -26,6 +30,7 @@ def get_single_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("", methods = ["POST"])
+@require_auth
 def add_contact(client_id):
     client = Client.query.get(client_id)
     if not client:
@@ -38,6 +43,7 @@ def add_contact(client_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["PUT"])
+@require_auth
 def update_contact(client_id, contact_id):
     body = request.json
     ContactValidator.validate(body)
@@ -52,6 +58,7 @@ def update_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["PATCH"])
+@require_auth
 def partial_update_contact(client_id, contact_id):
     body = request.json
     ContactPATCHValidator.validate(body)
@@ -66,6 +73,7 @@ def partial_update_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["DELETE"])
+@require_auth
 def delete_contact(client_id, contact_id):
     contact = Contact.query.filter(Contact.client_id == client_id, Contact.id == contact_id).first()
     if not contact:
