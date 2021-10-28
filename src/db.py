@@ -31,3 +31,16 @@ class Contact(db.Model):
     def as_dict(self):
         columns = ["id", "client_id", "name", "phone_number", "email"] # Columns that should be included in the conversion
         return {name: getattr(self, name) for name in columns}
+
+class ApiKey(db.Model):
+    __tablename__ = "api_kluce"
+
+    id                    = db.Column("id", db.Integer, primary_key=True)
+    key                   = db.Column("kluc", db.String, unique=True)
+
+    def as_dict(self):
+
+        return {
+            "id": self.id,
+            "key": self.key,
+        }

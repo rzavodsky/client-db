@@ -7,6 +7,7 @@ from db import db, Client, Contact
 # Routes
 from contact_routes import contacts, ContactNotFoundException
 from client_routes import clients, ClientNotFoundException
+from auth_routes import auth
 
 ### Error Handling ###
 
@@ -47,6 +48,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(clients, url_prefix="/clients")
     app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
+    app.register_blueprint(auth, url_prefix="/auth")
 
     db.init_app(app)
     return app
