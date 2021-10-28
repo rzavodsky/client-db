@@ -38,9 +38,21 @@ class ApiKey(db.Model):
     id                    = db.Column("id", db.Integer, primary_key=True)
     key                   = db.Column("kluc", db.String, unique=True)
 
+    perms = db.relationship("ApiPermission", back_populates="key")
+
     def as_dict(self):
 
         return {
             "id": self.id,
             "key": self.key,
         }
+
+class ApiPermission(db.Model):
+    __tablename__ = "api_prava"
+
+    id = db.Column("id", db.Integer, primary_key=True)
+    key_id = db.Column("kluc_id", db.Integer, db.ForeignKey("api_kluce.id"))
+    route = db.Column("route", db.String, nullable=False)
+    level = db.Column("level", db.Integer, nullable=False)
+
+    key = db.relationship("ApiKey", back_populates="perms")
