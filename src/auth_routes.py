@@ -5,11 +5,12 @@ from auth import generate_key, require_auth
 auth = Blueprint("auth", __name__)
 
 @auth.route("")
-@require_auth
+@require_auth("auth", 1)
 def get_all_keys():
     return {"data": [key.as_dict() for key in ApiKey.query.all()] }
 
 @auth.route("/<string:key>")
+@require_auth("auth", 1)
 def get_by_key(key):
     key_inst = ApiKey.query.filter(ApiKey.key == key).first()
     if not key_inst:
@@ -17,7 +18,7 @@ def get_by_key(key):
     return key_inst.as_dict()
 
 @auth.route("", methods = ["POST"])
-@require_auth
+@require_auth("auth", 2)
 def create_new_key():
     key = ApiKey(key = generate_key())
     db.session.add(key)
@@ -25,7 +26,7 @@ def create_new_key():
     return key.as_dict()
 
 @auth.route("/<int:key_id>", methods = ["DELETE"])
-@require_auth
+@require_auth("auth", 2)
 def delete_key(key_id):
     key = ApiKey.query.get(key_id)
     if not key:

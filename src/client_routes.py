@@ -9,7 +9,7 @@ from auth import require_auth
 clients = Blueprint("clients", __name__)
 
 @clients.route("")
-@require_auth
+@require_auth("client", 1)
 def get_all_clients():
     if request.args.get("q"):
         query = request.args.get("q")
@@ -19,7 +19,7 @@ def get_all_clients():
     return {"data": [client.as_dict() for client in clients]}
 
 @clients.route("/<int:client_id>")
-@require_auth
+@require_auth("client", 1)
 def get_single_client(client_id: int):
     client = Client.query.get(client_id)
     if not client:
@@ -27,7 +27,7 @@ def get_single_client(client_id: int):
     return client.as_dict()
 
 @clients.route("", methods = ["POST"])
-@require_auth
+@require_auth("client", 2)
 def add_client():
     body = request.json
     ClientValidator.validate(body)
@@ -38,7 +38,7 @@ def add_client():
 
 
 @clients.route("/<int:client_id>", methods = ["PUT"])
-@require_auth
+@require_auth("client", 2)
 def update_client(client_id: int):
     body = request.json
     ClientValidator.validate(body)
@@ -53,7 +53,7 @@ def update_client(client_id: int):
     return client.as_dict()
 
 @clients.route("/<int:client_id>", methods = ["PATCH"])
-@require_auth
+@require_auth("client", 2)
 def partial_update_client(client_id: int):
     body = request.json
     ClientPATCHValidator.validate(body)
@@ -68,7 +68,7 @@ def partial_update_client(client_id: int):
     return client.as_dict()
 
 @clients.route("/<int:client_id>", methods = ["DELETE"])
-@require_auth
+@require_auth("client", 2)
 def delete_client(client_id: int):
     client = Client.query.get(client_id)
     if not client:

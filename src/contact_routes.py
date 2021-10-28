@@ -9,7 +9,7 @@ from auth import require_auth
 contacts = Blueprint('contacts', __name__)
 
 @contacts.route("")
-@require_auth
+@require_auth("contact", 1)
 def get_all_contacts(client_id):
     client = Client.query.get(client_id)
     if client is None:
@@ -22,7 +22,7 @@ def get_all_contacts(client_id):
     return { "data": [contact.as_dict() for contact in contacts] }
 
 @contacts.route("/<int:contact_id>")
-@require_auth
+@require_auth("contact", 1)
 def get_single_contact(client_id, contact_id):
     contact = Contact.query.filter(Contact.client_id == client_id, Contact.id == contact_id).first()
     if contact is None:
@@ -30,7 +30,7 @@ def get_single_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("", methods = ["POST"])
-@require_auth
+@require_auth("contact", 2)
 def add_contact(client_id):
     client = Client.query.get(client_id)
     if not client:
@@ -43,7 +43,7 @@ def add_contact(client_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["PUT"])
-@require_auth
+@require_auth("contact", 2)
 def update_contact(client_id, contact_id):
     body = request.json
     ContactValidator.validate(body)
@@ -58,7 +58,7 @@ def update_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["PATCH"])
-@require_auth
+@require_auth("contact", 2)
 def partial_update_contact(client_id, contact_id):
     body = request.json
     ContactPATCHValidator.validate(body)
@@ -73,7 +73,7 @@ def partial_update_contact(client_id, contact_id):
     return contact.as_dict()
 
 @contacts.route("/<int:contact_id>", methods = ["DELETE"])
-@require_auth
+@require_auth("contact", 2)
 def delete_contact(client_id, contact_id):
     contact = Contact.query.filter(Contact.client_id == client_id, Contact.id == contact_id).first()
     if not contact:
