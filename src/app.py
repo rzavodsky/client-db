@@ -13,7 +13,7 @@ from client_routes import clients, ClientNotFoundException
 # All requests must be JSON
 def check_json():
     request.on_json_loading_failed = on_json_loading_failed
-    if request.method not in ["GET", "DELETE"] and not request.is_json:
+    if request.content_length and request.content_length > 0 and not request.is_json:
         return {"error": "Requests must be JSON"}, 400
 
 def on_json_loading_failed(e):
