@@ -1,26 +1,33 @@
 #!/usr/bin/env python3
-from peewee import *
-from playhouse.flask_utils import FlaskDB
+from flask_sqlalchemy import SQLAlchemy
 
-db = FlaskDB()
-
-client_types = ['pravnicka_osoba', 'fyzicka_osoba']
-class TypeField(Field):
-    '''Peewee doesn't support Postgres Enums, so this custom field is a way to let Peewee use the e_type enum.
-    The enum itself needs to be created manually in app.py when connecting to the database'''
-    field_type = "e_type"
-
+db = SQLAlchemy()
 
 class Client(db.Model):
-    name    = TextField()
-    address = TextField()
-    ico     = TextField(unique=True)
-    type    = TypeField()
+    __tablename__ = "klienti"
 
+    id      = db.Column("klient_id", db.Integer, primary_key=True)
+    name    = db.Column("knazov", db.String, nullable=False)
+    ico     = db.Column("kico", db.String, nullable=False)
+    zruseny = db.Column(db.String, nullable=False, default=0)
+
+    contacts = db.relationship("Contact", back_populates="client")
+
+    def as_dict(self):
+        columns = ["id", "name", "ico"] # Columns that should be included in the conversion
+        return {name: getattr(self, name) for name in columns}
 
 class Contact(db.Model):
-    client_id    = ForeignKeyField(Client, backref="contacts")
-    name         = TextField()
-    phone_number = TextField()
-    email        = TextField()
-    address      = TextField()
+    __tablename__ = "klient_kontakt"
+
+    id           = db.Column("kkontakt_id", db.Integer, primary_key=True)
+    client_id    = db.Column("kklient_id", db.Integer, db.ForeignKey("klienti.klient_id"))
+    name         = db.Column("kkmeno", db.String, nullable=False)
+    phone_number = db.Column("kktel", db.String)
+    email        = db.Column("kkemail", db.String)
+
+    client = db.relationship("Client", back_populates="contacts")
+
+    def as_dict(self):
+        columns = ["id", "client_id", "name", "phone_number", "email"] # Columns that should be included in the conversion
+        return {name: getattr(self, name) for name in columns}
