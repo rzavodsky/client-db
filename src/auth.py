@@ -1,6 +1,8 @@
 import secrets
 from flask import request
+
 from db import db, ApiKey, ApiPermission
+from schema_validation import perm_routes
 
 def generate_key():
     """Generates a new 32-byte token"""
@@ -10,6 +12,8 @@ def require_auth(route: str, level: int):
     """Decorator that will make the request require an api authentication
     route -- The route that needs authorization
     level -- The key needs at least this level to access this route"""
+    assert route in perm_routes, f"Route {route} is not in the perm_routes list"
+
     def require_auth_inner(fn):
         def wrapper(*args, **kwargs):
             key = request.headers.get("Authorization")

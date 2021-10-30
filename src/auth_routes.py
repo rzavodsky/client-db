@@ -1,6 +1,7 @@
-from flask import Blueprint
-from db import db, ApiKey
+from flask import Blueprint, request
+from db import db, ApiKey, ApiPermission
 from auth import generate_key, require_auth
+from schema_validation import AuthValidator, perm_routes
 
 auth = Blueprint("auth", __name__)
 
@@ -20,8 +21,35 @@ def get_by_key(key):
 @auth.route("", methods = ["POST"])
 @require_auth("auth", 2)
 def create_new_key():
+    body = request.json
+    AuthValidator.validate(body)
+
     key = ApiKey(key = generate_key())
+    for route, level in body["permissions"].items():
+        if level > 0:
+            key.perms.append(ApiPermission(route=route, level=level))
+
     db.session.add(key)
+    db.session.commit()
+    return key.as_dict()
+
+@auth.route("/<int:key_id>", methods = ["PUT", "PATCH"])
+@require_auth("auth", 2)
+def update_key(key_id):
+    key = ApiKey.query.get(key_id)
+    if not key:
+        raise KeyNotFoundException(key_id)
+
+    body = request.json
+    AuthValidator.validate(body)
+
+    for route, level in body["permissions"].items():
+        perm = ApiPermission.query.filter(ApiPermission.key_id == key_id, ApiPermission.route == route).first()
+        if perm:
+            perm.level = level
+        else:
+            key.perms.append(ApiPermission(route=route, level=level))
+
     db.session.commit()
     return key.as_dict()
 

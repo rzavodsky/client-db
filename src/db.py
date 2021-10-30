@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from flask_sqlalchemy import SQLAlchemy
+from schema_validation import perm_routes
 
 db = SQLAlchemy()
 
@@ -38,13 +39,16 @@ class ApiKey(db.Model):
     id                    = db.Column("id", db.Integer, primary_key=True)
     key                   = db.Column("kluc", db.String, unique=True)
 
-    perms = db.relationship("ApiPermission", back_populates="key")
+    perms = db.relationship("ApiPermission", back_populates="key", cascade="all,delete-orphan")
 
     def as_dict(self):
-
+        # This is used to fill all routes that this key doesn't have permissions for with 0
+        zero_perms = {route: 0 for route in perm_routes}
+        actual_perms = {perm.route: perm.level for perm in self.perms}
         return {
             "id": self.id,
             "key": self.key,
+            "permissions": {**zero_perms, **actual_perms}
         }
 
 class ApiPermission(db.Model):

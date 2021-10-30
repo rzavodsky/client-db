@@ -1,5 +1,9 @@
 from jsonschema import Draft7Validator
 
+
+# All routes that can be used in the "route" parameter of the auth_required decorator
+perm_routes = ["client", "contact", "auth"]
+
 client_schema = {
     "type": "object",
     "properties": {
@@ -20,15 +24,31 @@ contact_schema = {
     },
     "additionalProperties": False,
 }
+
+auth_schema = {
+    "type": "object",
+    "properties": {
+        "permissions": {
+            "type": "object",
+            "properties": { perm: { "type": "integer", "minimum": 0, "maximum": 100 } for perm in perm_routes},
+            "additionalProperties": False,
+        }
+    },
+    "additionalProperties": False,
+    "required": ["permissions"]
+}
 # All fields that should be required in a POST or PUT request
 contact_schema_required = ["name", "phone_number", "email"]
 
 
 Draft7Validator.check_schema({**client_schema, "required": client_schema_required})
 Draft7Validator.check_schema({**contact_schema, "required": contact_schema_required})
+Draft7Validator.check_schema(auth_schema)
 
 ClientValidator = Draft7Validator({**client_schema, "required": client_schema_required}) # Used for PUT and POST requests
 ClientPATCHValidator = Draft7Validator(client_schema) # Used for PATCH requests
 
 ContactValidator = Draft7Validator({**contact_schema, "required": contact_schema_required}) # Used for PUT and POST requests
 ContactPATCHValidator = Draft7Validator(contact_schema) # Used for PATCH requests
+
+AuthValidator = Draft7Validator(auth_schema)
