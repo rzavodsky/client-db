@@ -7,7 +7,7 @@ from db import db, Client, Contact
 # Routes
 from contact_routes import contacts, ContactNotFoundException
 from client_routes import clients, ClientNotFoundException
-from auth_routes import auth
+from auth_routes import auth, KeyNotFoundException
 
 ### Error Handling ###
 
@@ -25,6 +25,9 @@ def handle_client_not_found(e: ClientNotFoundException):
 
 def handle_contact_not_found(e: ContactNotFoundException):
     return {"error": f"Contact {e.contact_id} was not found under client {e.client_id}"}
+
+def handle_key_not_found(e: KeyNotFoundException):
+    return {"error": f"Key {e.key} was not found"}
 
 def handle_validation_error(e: ValidationError):
     return {"error": e.message}, 400 # Bad Request
@@ -44,6 +47,7 @@ def create_app():
     app.register_error_handler(ValidationError, handle_validation_error)
     app.register_error_handler(ClientNotFoundException, handle_client_not_found)
     app.register_error_handler(ContactNotFoundException, handle_contact_not_found)
+    app.register_error_handler(KeyNotFoundException, handle_key_not_found)
 
     # Register blueprints
     app.register_blueprint(clients, url_prefix="/clients")
