@@ -47,7 +47,6 @@ class ApiKey(db.Model):
         actual_perms = {perm.route: perm.level for perm in self.perms}
         return {
             "id": self.id,
-            "key": self.key,
             "permissions": {**zero_perms, **actual_perms}
         }
 

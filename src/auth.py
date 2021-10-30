@@ -1,4 +1,5 @@
 import secrets
+from hashlib import sha256
 from flask import request
 
 from db import db, ApiKey, ApiPermission
@@ -7,6 +8,11 @@ from schema_validation import perm_routes
 def generate_key():
     """Generates a new 32-byte token"""
     return secrets.token_urlsafe(32)
+
+def hash_key(key: str):
+    """Return a hash of a key which can be stored in a database"""
+    return sha256(key.encode('utf-8')).hexdigest()
+
 
 def require_auth(route: str, level: int):
     """Decorator that will make the request require an api authentication
@@ -22,11 +28,11 @@ def require_auth(route: str, level: int):
             key = key.removeprefix("Bearer ")
 
             key_inst = db.session.query(ApiKey, ApiPermission).filter(ApiKey.id == ApiPermission.key_id,
-                                                                      ApiKey.key == key,
+                                                                      ApiKey.key == hash_key(key),
                                                                       ApiPermission.route == route,
                                                                       ApiPermission.level >= level).scalar()
             if not key_inst:
-                if ApiKey.query.filter(ApiKey.key == key):
+                if ApiKey.query.filter(ApiKey.key == hash_key(key)).scalar():
                     # Key exists, but doesn't have necessary permissions
                     return "", 403 # Forbidden
                 else:
