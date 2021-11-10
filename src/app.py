@@ -7,13 +7,14 @@ from db import db, Client, Contact
 # Routes
 from contact_routes import contacts, ContactNotFoundException
 from client_routes import clients, ClientNotFoundException
+from auth_routes import auth, KeyNotFoundException
 
 ### Error Handling ###
 
 # All requests must be JSON
 def check_json():
     request.on_json_loading_failed = on_json_loading_failed
-    if request.method not in ["GET", "DELETE"] and not request.is_json:
+    if request.content_length and request.content_length > 0 and not request.is_json:
         return {"error": "Requests must be JSON"}, 400
 
 def on_json_loading_failed(e):
@@ -24,6 +25,9 @@ def handle_client_not_found(e: ClientNotFoundException):
 
 def handle_contact_not_found(e: ContactNotFoundException):
     return {"error": f"Contact {e.contact_id} was not found under client {e.client_id}"}
+
+def handle_key_not_found(e: KeyNotFoundException):
+    return {"error": f"Key {e.key} was not found"}
 
 def handle_validation_error(e: ValidationError):
     return {"error": e.message}, 400 # Bad Request
@@ -43,10 +47,12 @@ def create_app():
     app.register_error_handler(ValidationError, handle_validation_error)
     app.register_error_handler(ClientNotFoundException, handle_client_not_found)
     app.register_error_handler(ContactNotFoundException, handle_contact_not_found)
+    app.register_error_handler(KeyNotFoundException, handle_key_not_found)
 
     # Register blueprints
     app.register_blueprint(clients, url_prefix="/clients")
     app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
+    app.register_blueprint(auth, url_prefix="/auth")
 
     db.init_app(app)
     return app
