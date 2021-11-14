@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from app import db
+from auth.schema import perm_routes
 
 class ApiKey(db.Model):
     __tablename__ = "api_kluce"
