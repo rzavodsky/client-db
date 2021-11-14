@@ -2,9 +2,10 @@
 from flask import Blueprint, request, abort, make_response
 from jsonschema import ValidationError
 
-from db import db, Client
-from schema_validation import ClientValidator, ClientPATCHValidator
-from auth import require_auth
+from app import db
+from client.model import Client
+from client.schema import ClientValidator, ClientPATCHValidator
+from auth.utils import require_auth
 
 clients = Blueprint("clients", __name__)
 

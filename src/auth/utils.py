@@ -2,8 +2,9 @@ import secrets
 from hashlib import sha256
 from flask import request
 
-from db import db, ApiKey, ApiPermission
-from schema_validation import perm_routes
+from app import db
+from auth.model import ApiKey, ApiPermission
+from auth.schema import perm_routes
 
 def generate_key():
     """Generates a new 32-byte token"""

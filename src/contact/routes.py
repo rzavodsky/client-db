@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 from flask import Blueprint, request
 
-from client_routes import ClientNotFoundException
-from db import db, Client, Contact
-from schema_validation import ContactValidator, ContactPATCHValidator
-from auth import require_auth
+from client.routes import ClientNotFoundException
+from client.model import Client
+from contact.model import Contact
+from contact.schema import ContactValidator, ContactPATCHValidator
+from app import db
+from auth.utils import require_auth
 
 contacts = Blueprint('contacts', __name__)
 

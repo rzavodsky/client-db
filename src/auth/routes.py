@@ -1,7 +1,8 @@
 from flask import Blueprint, request
-from db import db, ApiKey, ApiPermission
-from auth import generate_key, require_auth, hash_key
-from schema_validation import AuthValidator, perm_routes
+from app import db
+from auth.model import ApiKey, ApiPermission
+from auth.utils import generate_key, require_auth, hash_key
+from auth.schema import AuthValidator, perm_routes
 
 auth = Blueprint("auth", __name__)
 
