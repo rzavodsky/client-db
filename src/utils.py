@@ -1,7 +1,9 @@
 import math
 from sqlalchemy.orm.query import Query
+from app import db
 
-def paginate_query(query: Query, offset: int, limit: int):
+def paginate_query(query: Query, offset: int, limit: int) -> dict:
+    """Returns paginated data from database along with some metadata"""
     total_rows = query.count()
     total_pages = math.ceil(total_rows / limit)
     page_data = query.offset(offset).limit(limit).all()
@@ -22,3 +24,13 @@ def paginate_query(query: Query, offset: int, limit: int):
             "next_skip": next_offset
         }
     }
+
+def autoincrement_id(context):
+    """Increments a number in the top_ids table based on the table name and returns the incremented number
+    This function should be used as the default for all id columns instead of autoincrement"""
+    table_name = context.current_column.table.name
+    db.session.execute("UPDATE Top_IDs SET top_ID = top_ID + 1 WHERE top_table = :table_name", {"table_name": table_name})
+    result = db.session.execute(
+        "SELECT top_ID FROM Top_IDs WHERE top_table = :table_name",
+        {"table_name": table_name}).scalar()
+    return result

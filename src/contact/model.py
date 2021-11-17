@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 from app import db
+from utils import autoincrement_id
 
 class Contact(db.Model):
     __tablename__ = "klient_kontakt"
 
-    id           = db.Column("kkontakt_id", db.Integer, primary_key=True)
+    id           = db.Column("kkontakt_id", db.Integer, primary_key=True, default=autoincrement_id)
     client_id    = db.Column("kklient_id", db.Integer, db.ForeignKey("klienti.klient_id"))
     name         = db.Column("kkmeno", db.String, nullable=False)
     phone_number = db.Column("kktel", db.String)
