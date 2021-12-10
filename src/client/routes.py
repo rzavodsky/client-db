@@ -2,20 +2,27 @@
 from flask import Blueprint, request, abort, make_response
 from jsonschema import ValidationError
 
-from db import db, Client
-from schema_validation import ClientValidator, ClientPATCHValidator
-from auth import require_auth
+from app import db
+from client.model import Client
+from client.schema import ClientValidator, ClientPATCHValidator
+from auth.utils import require_auth
+from utils import paginate_query
 
 clients = Blueprint("clients", __name__)
 
 @clients.route("")
 @require_auth("client", 1)
 def get_all_clients():
-    if request.args.get("q"):
-        query = request.args.get("q")
-        clients = Client.query.filter(Client.name.ilike(f"%{query}%"))
-    else:
-        clients = Client.query.all()
+    search_query = request.args.get("q")
+    limit = request.args.get("top", type=int)
+    offset = request.args.get("skip", 0, type=int)
+
+    clients = Client.query
+    if search_query:
+        clients = clients.filter(Client.name.ilike(f"%{search_query}%"))
+
+    if limit:
+        return paginate_query(clients, offset, limit)
     return {"data": [client.as_dict() for client in clients]}
 
 @clients.route("/<int:client_id>")

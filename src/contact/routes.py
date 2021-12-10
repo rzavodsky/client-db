@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 from flask import Blueprint, request
 
-from client_routes import ClientNotFoundException
-from db import db, Client, Contact
-from schema_validation import ContactValidator, ContactPATCHValidator
-from auth import require_auth
+from client.routes import ClientNotFoundException
+from client.model import Client
+from contact.model import Contact
+from contact.schema import ContactValidator, ContactPATCHValidator
+from app import db
+from auth.utils import require_auth
+from utils import paginate_query
 
 contacts = Blueprint('contacts', __name__)
 
@@ -12,13 +15,20 @@ contacts = Blueprint('contacts', __name__)
 @require_auth("contact", 1)
 def get_all_contacts(client_id):
     client = Client.query.get(client_id)
+
+    search_query = request.args.get("q")
+    limit = request.args.get("top", type=int)
+    offset = request.args.get("skip", 0, type=int)
+
     if client is None:
         raise ClientNotFoundException(client_id)
-    if request.args.get("q"):
-        query = request.args.get("q")
-        contacts = Contact.query.filter(Contact.name.ilike("%{query}%"), Contact.client_id == client_id)
-    else:
-        contacts = client.contacts
+
+    contacts = Contact.query.filter(Contact.client_id == client_id)
+    if search_query:
+        contacts = contacts.filter(Contact.name.ilike(f"%{search_query}%"))
+
+    if limit:
+        return paginate_query(contacts, offset, limit)
     return { "data": [contact.as_dict() for contact in contacts] }
 
 @contacts.route("/<int:contact_id>")

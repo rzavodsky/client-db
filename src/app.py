@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 from flask import Flask, request, abort, make_response
 from jsonschema import ValidationError
-
-from db import db, Client, Contact
+from flask_sqlalchemy import SQLAlchemy
 
 # Routes
-from contact_routes import contacts, ContactNotFoundException
-from client_routes import clients, ClientNotFoundException
-from auth_routes import auth, KeyNotFoundException
+
+db = SQLAlchemy()
 
 ### Error Handling ###
 
@@ -17,22 +15,25 @@ def check_json():
     if request.content_length and request.content_length > 0 and not request.is_json:
         return {"error": "Requests must be JSON"}, 400
 
-def on_json_loading_failed(e):
+def on_json_loading_failed(_e):
     abort(make_response({"error": "Can't parse JSON"}, 400))
 
-def handle_client_not_found(e: ClientNotFoundException):
+def handle_client_not_found(e):
     return {"error": f"Client {e.client_id} not found"}
 
-def handle_contact_not_found(e: ContactNotFoundException):
+def handle_contact_not_found(e):
     return {"error": f"Contact {e.contact_id} was not found under client {e.client_id}"}
 
-def handle_key_not_found(e: KeyNotFoundException):
+def handle_key_not_found(e):
     return {"error": f"Key {e.key} was not found"}
 
 def handle_validation_error(e: ValidationError):
     return {"error": e.message}, 400 # Bad Request
 
 def create_app():
+    from contact.routes import contacts, ContactNotFoundException
+    from client.routes import clients, ClientNotFoundException
+    from auth.routes import auth, KeyNotFoundException
     app = Flask(__name__)
 
     #DB Config
