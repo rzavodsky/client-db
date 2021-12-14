@@ -34,6 +34,7 @@ def create_app():
     from contact.routes import contacts, ContactNotFoundException
     from client.routes import clients, ClientNotFoundException
     from auth.routes import auth, KeyNotFoundException
+    from bloky.routes import bloky
     app = Flask(__name__)
 
     #DB Config
@@ -54,6 +55,7 @@ def create_app():
     app.register_blueprint(clients, url_prefix="/clients")
     app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
     app.register_blueprint(auth, url_prefix="/auth")
+    app.register_blueprint(bloky, url_prefix="/bloky")
 
     db.init_app(app)
     return app
