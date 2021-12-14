@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from flask import Blueprint, request, abort, make_response
 from jsonschema import ValidationError
 
