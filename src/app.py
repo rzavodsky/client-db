@@ -55,7 +55,7 @@ def create_app():
     app.register_blueprint(clients, url_prefix="/clients")
     app.register_blueprint(contacts, url_prefix="/clients/<int:client_id>/contacts")
     app.register_blueprint(auth, url_prefix="/auth")
-    app.register_blueprint(bloky, url_prefix="/bloky")
+    app.register_blueprint(bloky, url_prefix="/blocks")
 
     db.init_app(app)
     return app
