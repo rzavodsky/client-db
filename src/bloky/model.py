@@ -48,7 +48,7 @@ class PlanProd(db.Model):
     address = db.relationship("Adresa", lazy="joined")
 
     def as_dict(self):
-        plan = {field: getattr(self, field) for field in ["spot_order", "spot_id", "spot_length", "spot_address"]}
+        plan = {field: getattr(self, field) for field in ["spot_order", "spot_id", "spot_length", "spot_address", "broadcasted"]}
         address = self.address.as_dict()
 
         return {**plan, **address}
